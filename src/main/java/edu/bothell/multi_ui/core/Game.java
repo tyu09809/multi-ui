@@ -39,13 +39,36 @@ public class Game {
     
     public boolean isValid(int[] pos, String sId){
         System.out.println("isVAlid?"+s.getIt(pos)+"|" + sId+"|" + active.getSId()+"|");
+
+        if(pos[0] > 0 && pos[1] <= 2) return false;
+
         return s.isOpen(pos) && active.getSId().equals(sId);
+    }
+
+    public boolean checkRow(){
+        if (turn > 9 - 1) return true;
+        boolean couldWin = true;
+        for (char c : this.s.getIt()[0]) {
+            if (c != active.getChar()) couldWin = false;
+        }
+
+        return couldWin;
+    }
+
+    public boolean checkLoss(){
+        if (turn > 9 - 1) return true;
+        
+        if (checkRow()) return true;
+
+        return false;
     }
 
     public char play(int[] pos, String sId){
         if(!isValid(pos, sId)) return ' ';
         turn++;
         this.s.setIt(active.getChar(), pos[0], pos[1]);
+        if (checkLoss()) active.getChar();
+
         this.active = p.get( turn % p.size() );
 
         return active.getChar();

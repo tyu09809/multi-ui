@@ -6,6 +6,7 @@ public class Transit {
     public char[][]     s;
     public String[][]   t;
     public char         a;
+    public boolean      over;
 
     public Transit(char[][] state, char active){
         this.s = state;
