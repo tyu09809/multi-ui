@@ -1,8 +1,3 @@
-package edu.bothell.multi_ui.core;
-
-import java.util.ArrayList;
-
-
 public class Game {
     private final int                  MAX_PLAYERS = 3;
     private final ArrayList<Player>    p;
@@ -15,7 +10,7 @@ public class Game {
         this.s = new World();
         this.p = new ArrayList<>();
     }
-    
+
     public Player addPlayer(Player p){
         this.p.add(p);
         if(this.active == null) active = p;
@@ -36,41 +31,50 @@ public class Game {
         
         return pcs;
     }
-    
+
     public boolean isValid(int[] pos, String sId){
-        System.out.println("isVAlid?"+s.getIt(pos)+"|" + sId+"|" + active.getSId()+"|");
+        System.out.println("isValid?"+s.getIt(pos)+"|" + sId+"|" + active.getSId()+"|");
 
         if(pos[0] > 0 && pos[1] <= 2) return false;
 
         return s.isOpen(pos) && active.getSId().equals(sId);
     }
 
-    public boolean checkRow(){
-        if (turn > 9 - 1) return true;
-        boolean couldWin = true;
-        for (char c : this.s.getIt()[0]) {
-            if (c != active.getChar()) couldWin = false;
+    public boolean checkGameEnd() {
+        char[][] board = s.getIt(); // Assuming this returns a 2D char array representing the board
+        char currentChar = active.getChar();
+
+        // Check rows and columns
+        for (int i = 0; i < board.length; i++) {
+            if (checkLine(board[i][0], board[i][1], board[i][2], currentChar) ||
+                checkLine(board[0][i], board[1][i], board[2][i], currentChar)) { 
+                return true;
+            }
         }
 
-        return couldWin;
+        // Check diagonals
+        if (checkLine(board[0][0], board[1][1], board[2][2], currentChar) || 
+            checkLine(board[0][2], board[1][1], board[2][0], currentChar)) { 
+            return true;
+        }
+
+        return false; // No winner found
     }
 
-    public boolean checkLoss(){
-        if (turn > 9 - 1) return true;
-        
-        if (checkRow()) return true;
-
-        return false;
+    private boolean checkLine(char a, char b, char c, char currentChar) {
+        return a == currentChar && b == currentChar && c == currentChar;
     }
 
     public char play(int[] pos, String sId){
         if(!isValid(pos, sId)) return ' ';
         turn++;
         this.s.setIt(active.getChar(), pos[0], pos[1]);
-        if (checkLoss()) active.getChar();
+        if (checkGameEnd()) {
+            System.out.println("Player " + active.getChar() + " wins!");
+            return active.getChar(); // Return the winning character
+        }
 
-        this.active = p.get( turn % p.size() );
-
+        this.active = p.get(turn % p.size());
         return active.getChar();
     }
 
@@ -101,6 +105,4 @@ public class Game {
     public int getTurn(){
         return this.turn;
     }
-
-
 }
